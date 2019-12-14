@@ -1,0 +1,138 @@
+# NOTICE:
+# To Who It May Concern, Greetings!
+#
+# Any further reading of this document may imply having accepted the terms
+# and conditions referred herein. The author strongly advises readers to 
+# independenty search terms and conditions of the service providers mentioned
+# herein and to read the information given here only if they are willing to
+# accept such terms and conditions.
+#
+# The author offers NO WARRANTY on the services that may have been described in 
+# this document and cannot assert service level assurances including privacy and
+# security.
+#
+# The readers access this file in their own capacity and on their own risk. The
+# readers are expected to be aware of the laws applicable to them and to uphold them.
+#
+# Readers not agreeable to these terms and conditions are urged to close / delete this
+# document as appropriate and not use the content in any manner.
+#
+# The content in this file are for informative purposes only vide
+# fair reporting priviledges. It is not licensed for any purpose other
+# than the open collabortion of knowledge, and that too subject to 
+# any limitations present in the URLs referred herein.
+#
+# This specific file's structure is (C) Copyright 2019 Abhishek Choudhary, with
+# due acknowledgement to the links provided herein and the fair citation of material
+# therefrom.
+#
+# The content of this file that are not subject to any intellectual property of
+# 3rd party are released under Creative Commons Share Alike license. This does
+# not extend to any links referred to by this file and those may only be accessed
+# as per their independent terms and conditions.
+#
+# This file derives cotent based on material available
+# at https://web.archive.org/web/20180925182807/https://yandex.com/support/disk/cli-clients.html
+# as accessed on 14th December 2019 (archived prior to access by this author)
+# and also available from https://yandex.com/support/disk/cli-clients.html
+# as accessed on 14th December 2019
+#
+# Having been written in "literate programming" format, this file may result in
+# actions by computers and other devices that are subject to the license agreement
+# at https://yandex.com/legal/desktop_software_agreement/
+#
+# Readers are expected to have read and understood the above license agreement
+# and to abide by its terms and conditions, and expressly agree to indemnify the
+# author from any damages or claims resulting from the usage of this information.
+#
+
+# Description of the service profile 
+
+# The service name may be claimed as trademark by the original vendors / authors,
+# and it is acknowledged as such
+service="Yandex.Disk"
+# As per https://en.wikipedia.org/wiki/Yandex_Disk accessed on 14th December 2019 
+# Quote
+#     Yandex.Disk (Russian: Яндекс.Диск) is a cloud service created by Yandex 
+#     that lets users store files on “cloud” servers and share them with others online.
+#     The service is based on syncing data between different devices.
+#     Yandex.Disk was launched in English in June 2012.
+# Unquote
+# From the same source, through a citation
+# Quote
+#    Since October 18, 2019, Yandex.Disk has started throttling WebDAV, causing some
+#    clients to time out[4], the official page redirects to the Yandex.Disk 3.0 client
+#    page, support writes: “Yandex.Disk is a personal service that is not designed to
+#    be used as an infrastructure element. For such tasks, we have Yandex.Cloud"[5]
+# Unquote
+#
+# The above references are from the following links - content not verified
+#
+
+# The following are external URLs not controlled by the author,
+# and subject to respective copyrights, if any. The readers are expected
+# to verify the information from the original source
+site_url="https://yandex.com"
+eula_url="https://yandex.com/legal/desktop_software_agreement/"
+howto_url="https://yandex.com/support/disk/cli-clients.html"
+
+# Installation method as described in the original sources
+install_process() {
+  # Based on instructions available at https://yandex.com/support/disk/cli-clients.html
+  # Content may be subject to external copyright. Readers are epected to verify the information from the
+  # original source.
+  # Quote from above link
+      echo "deb http://repo.yandex.ru/yandex-disk/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/yandex-disk.list > /dev/null &&\
+      wget http://repo.yandex.ru/yandex-disk/YANDEX-DISK-KEY.GPG -O- | sudo apt-key add - &&\
+      sudo apt-get update &&\
+      sudo apt-get install -y yandex-disk
+  # Unquote
+}
+
+# Authentication method 
+# To start the service you may call the binary as mentioned below
+# with the "start" option as per https://yandex.com/support/disk/cli-clients.html#cli-daemon
+tool_prog="/usr/bin/yandex-disk"
+tool_options="start"
+
+auth_process() {
+  # The default target directory need not be replaced, but
+  # you may set it to any directory of your choice by replacing
+  # the ${1} reference tag below
+  targetdir=${1}
+
+  # When executed, the binary expects the user to provide their
+  # username and password. This must be done only after autheticating
+  # that a verifiable client is running on the system.
+  read -p "Username: " uuid
+  read -s -p "Password: " upwd
+
+  /usr/bin/expect <<EOF
+    # For the first time after installing the tool, the user is expected to
+    # execute the program with the "setup" option
+    spawn "${prog}" "setup"
+    
+    # Some suggested interactions are mentioned below
+    # where "expect" refers to the prompt you will see
+    # and "send" refers to the expected response 
+    expect "Would you like to use a proxy server?"
+      send "n\r"
+    expect "Enter username:"
+      send "${uuid}\r"
+    expect "Enter password:"
+      send "${upwd}\r"
+    expect "/Yandex.Disk'):"
+      send "${targetdir}\r"
+    expect "Would you like Yandex.Disk to launch on startup?"
+      send "y\r"
+    
+    # Please expect the program to terminate at this point,
+    # unless the credentials above were not correct.
+    expect eof
+    exit
+EOF
+}
+
+# The author suggests that the readers trying the services of the service
+# provider also look up their commercial options.
+#
