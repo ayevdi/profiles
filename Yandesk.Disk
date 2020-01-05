@@ -110,7 +110,7 @@ auth_process() {
   /usr/bin/expect <<EOF
     # For the first time after installing the tool, the user is expected to
     # execute the program with the "setup" option
-    spawn "${prog}" "setup"
+    spawn "${tool_prog}" "setup"
     
     # Some suggested interactions are mentioned below
     # where "expect" refers to the prompt you will see
